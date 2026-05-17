@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="LinguaFlow – KI-gestützte Sprachlern-App für Berufstätige. Lerne Sprachen fließend mit personalisierten Lektionen und KI-Konversationspartner." />
+  <title>LinguaFlow – Sprachen fließend lernen</title>
+
+  <!--
+    SCHRIFTARTEN (SIL Open Font License 1.1)
+    – DM Serif Display: klassisch-editoriale Serifen-Schrift (Überschriften)
+    – Instrument Sans: klarer, moderner Groteskstil (UI, Navigation, Labels)
+    – Lora: humanistische Antiqua für Fließtext (Absätze)
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ══════════════════════════════════════════════════════════
+       DESIGN TOKENS
+    ══════════════════════════════════════════════════════════ */
+    :root {
+      /* Palette – warm ivory editorial */
+      --ivory:       #F5F0E8;
+      --ivory-dark:  #EDE7D9;
+      --ivory-deeper:#E3DAC8;
+      --ink:         #1C1915;
+      --ink-soft:    #3D3830;
+      --muted:       #7A7060;
+      --rule:        #D5CCBA;
+
+      /* Accents */
+      --terra:       #B85C38;   /* terracotta – warmth, energy */
+      --terra-light: #EDCFBF;
+      --sapphire:    #2D5078;   /* professional depth */
+      --sage:        #4A6741;   /* growth */
+
+      /* Semantic */
+      --c-bg:       var(--ivory);
+      --c-surface:  #FDFAF5;
+      --c-border:   var(--rule);
+      --c-text:     var(--ink-soft);
+      --c-heading:  var(--ink);
+      --c-accent:   var(--terra);
+      --c-accent2:  var(--sapphire);
+
+      /* Typography */
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --font-ui:      'Instrument Sans', system-ui, sans-serif;
+      --font-body:    'Lora', Georgia, serif;
+
+      /* Spacing */
+      --max-w: 1140px;
+      --radius: 4px;
+      --radius-md: 8px;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       RESET
+    ══════════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 1.0625rem;
+      line-height: 1.75;
+      color: var(--c-text);
+      background: var(--c-bg);
+    }
+
+    img { max-width: 100%; height: auto; display: block; }
+
+    a { color: var(--terra); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover { color: var(--sapphire); }
+
+    :focus-visible {
+      outline: 2px solid var(--terra);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: var(--font-display);
+      color: var(--c-heading);
+      line-height: 1.15;
+      font-weight: 400; /* DM Serif is already hefty */
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       SKIP LINK – WCAG 2.4.1
+    ══════════════════════════════════════════════════════════ */
+    .skip-link {
+      position: absolute;
+      top: -999px; left: 16px;
+      background: var(--terra);
+      color: #fff;
+      font-family: var(--font-ui);
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: var(--radius);
+      z-index: 9999;
+      text-decoration: none;
+    }
+    .skip-link:focus { top: 16px; }
+
+    /* ══════════════════════════════════════════════════════════
+       LAYOUT
+    ══════════════════════════════════════════════════════════ */
+    .container { max-width: var(--max-w); margin-inline: auto; padding-inline: 28px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    section { padding-block: 88px; }
+
+    /* Horizontal rule decoration */
+    .ornament {
+      display: flex; align-items: center; gap: 14px;
+      font-family: var(--font-ui); font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 18px;
+    }
+    .ornament::before, .ornament::after {
+      content: ''; flex: 1; height: 1px; background: var(--rule);
+    }
+    .ornament-left {
+      justify-content: flex-start;
+    }
+    .ornament-left::before { display: none; }
+    .ornament-left::after { flex: unset; width: 40px; }
+
+    .section-title {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      margin-bottom: 16px;
+    }
+    .section-sub {
+      font-family: var(--font-body);
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 560px;
+      font-style: italic;
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       HEADER
+    ══════════════════════════════════════════════════════════ */
+    .site-header {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(245,240,232,0.96);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .nav-inner {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      height: 68px; gap: 16px;
+    }
+
+    .logo {
+      text-decoration: none; display: flex; align-items: baseline; gap: 3px;
+      flex-shrink: 0;
+    }
+    .logo-word {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .logo-word span { color: var(--terra); }
+    .logo-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--terra);
+      margin-left: 2px; margin-bottom: 6px;
+      display: inline-block;
+    }
+
+    .nav-links {
+      display: flex; list-style: none; padding: 0; gap: 2px;
+    }
+    .nav-links li { margin: 0; }
+    .nav-links a {
+      font-family: var(--font-ui); font-size: 0.8125rem; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      padding: 7px 11px; border-radius: var(--radius);
+      transition: color 0.15s, background 0.15s;
+    }
+    .nav-links a:hover, .nav-links a[aria-current="page"] {
+      color: var(--ink); background: var(--ivory-dark);
+    }
+
+    .nav-cta {
+      font-family: var(--font-ui); font-size: 0.8125rem; font-weight: 600;
+      background: var(--terra); color: #fff !important;
+      padding: 9px 20px; border-radius: var(--radius);
+      text-decoration: none; white-space: nowrap;
+      transition: opacity 0.15s;
+      letter-spacing: 0.01em;
+    }
+    .nav-cta:hover { opacity: 0.88; }
+
+    .nav-toggle {
+      display: none; background: none; border: none;
+      cursor: pointer; padding: 8px; color: var(--ink);
+    }
+    .nav-toggle svg { width: 22px; height: 22px; }
+
+    @media (max-width: 800px) {
+      .nav-toggle { display: flex; align-items: center; }
+      .nav-links {
+        display: none; position: absolute;
+        top: 68px; left: 0; right: 0;
+        flex-direction: column;
+        background: var(--c-surface);
+        border-bottom: 1px solid var(--rule);
+        padding: 10px 16px 20px; gap: 2px;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links a { font-size: 0.9375rem; padding: 11px 14px; }
+      .nav-cta { display: none; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       BUTTONS
+    ══════════════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.875rem;
+      letter-spacing: 0.01em;
+      padding: 12px 26px; border-radius: var(--radius);
+      cursor: pointer; border: 1px solid transparent;
+      text-decoration: none;
+      transition: opacity 0.15s, background 0.15s, color 0.15s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--terra); color: #fff; border-color: var(--terra); }
+    .btn-primary:hover { opacity: 0.88; color: #fff; }
+    .btn-outline {
+      background: transparent;
+      border-color: var(--ink);
+      color: var(--ink);
+    }
+    .btn-outline:hover { background: var(--ink); color: var(--ivory); }
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--rule);
+      color: var(--ink-soft);
+    }
+    .btn-ghost:hover { background: var(--ivory-dark); }
+    .btn-sapphire { background: var(--sapphire); color: #fff; border-color: var(--sapphire); }
+    .btn-sapphire:hover { opacity: 0.88; color: #fff; }
+
+    /* ══════════════════════════════════════════════════════════
+       CARDS
+    ══════════════════════════════════════════════════════════ */
+    .card {
+      background: var(--c-surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      padding: 28px;
+    }
+    .card-hover { transition: border-color 0.2s, box-shadow 0.2s; }
+    .card-hover:hover {
+      border-color: var(--terra);
+      box-shadow: 3px 3px 0 var(--terra-light);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       FOOTER
+    ══════════════════════════════════════════════════════════ */
+    .site-footer {
+      background: var(--ink);
+      padding-block: 56px 32px;
+      margin-top: 80px;
+    }
+    .footer-grid {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+    }
+    .footer-brand .logo-word { color: var(--ivory); }
+    .footer-brand p { color: #8A837A; font-size: 0.875rem; margin-top: 12px; max-width: 240px; font-family: var(--font-ui); }
+    .footer-col h3 {
+      font-family: var(--font-ui); font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #6A6360; margin-bottom: 14px;
+    }
+    .footer-col ul { list-style: none; padding: 0; }
+    .footer-col li { margin-bottom: 9px; }
+    .footer-col a { color: #A09890; font-size: 0.875rem; font-family: var(--font-ui); text-decoration: none; }
+    .footer-col a:hover { color: var(--ivory); }
+    .footer-bottom {
+      margin-top: 40px; padding-top: 24px;
+      border-top: 1px solid #2E2B28;
+      display: flex; justify-content: space-between;
+      align-items: center; flex-wrap: wrap; gap: 12px;
+      font-size: 0.78rem; color: #5A5450; font-family: var(--font-ui);
+    }
+    @media (max-width: 680px) {
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 420px) {
+      .footer-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PAGE: HOME
+    ══════════════════════════════════════════════════════════ */
+
+    /* ── Hero ── */
+    .hero {
+      padding-block: 100px 80px;
+      border-bottom: 1px solid var(--rule);
+      position: relative;
+      overflow: hidden;
+    }
+    /* Subtle half-tone dot grid background */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--rule) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1.05fr 0.95fr;
+      gap: 72px; align-items: center; position: relative;
+    }
+
+    /* Large editorial pull-quote style heading */
+    .hero-kicker {
+      font-family: var(--font-ui); font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--terra); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-kicker::before {
+      content: ''; width: 24px; height: 1px; background: var(--terra);
+    }
+    .hero-title {
+      font-size: clamp(2.8rem, 6vw, 4.6rem);
+      line-height: 1.07;
+      margin-bottom: 24px;
+      letter-spacing: -0.01em;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--terra);
+    }
+    .hero-lead {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 440px;
+      margin-bottom: 40px;
+      font-style: italic;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .hero-actions small {
+      font-family: var(--font-ui); font-size: 0.75rem;
+      color: var(--muted); margin-left: 4px;
+    }
+
+    /* App mock – editorial magazine-style layout */
+    .app-mock {
+      background: var(--c-surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: 6px 6px 0 var(--ivory-deeper);
+    }
+    .mock-toolbar {
+      background: var(--ivory-dark);
+      border-bottom: 1px solid var(--rule);
+      padding: 10px 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mock-dot { width: 9px; height: 9px; border-radius: 50%; }
+    .mock-title {
+      font-family: var(--font-ui); font-size: 0.72rem;
+      color: var(--muted); margin-left: 6px; letter-spacing: 0.04em;
+    }
+    .mock-body { padding: 20px; }
+    .mock-lesson {
+      border-left: 3px solid var(--terra);
+      padding-left: 14px; margin-bottom: 16px;
+    }
+    .mock-lang {
+      font-family: var(--font-ui); font-size: 0.67rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase; color: var(--terra);
+      margin-bottom: 4px;
+    }
+    .mock-phrase { font-family: var(--font-display); font-size: 1.2rem; color: var(--ink); margin-bottom: 2px; }
+    .mock-trans { font-family: var(--font-ui); font-size: 0.8rem; color: var(--muted); }
+    .mock-progress-label {
+      font-family: var(--font-ui); font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 8px;
+      display: flex; justify-content: space-between;
+    }
+    .mock-track {
+      height: 4px; background: var(--ivory-dark); border-radius: 2px; overflow: hidden;
+    }
+    .mock-fill { height: 100%; width: 62%; background: var(--terra); border-radius: 2px; }
+
+    /* ── Stats ── */
+    .stats-band {
+      background: var(--ink); padding-block: 48px;
+      border-block: none;
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .stat-item {
+      text-align: center;
+      padding-inline: 16px;
+      border-right: 1px solid #2E2B28;
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 3rem; color: var(--ivory);
+      line-height: 1;
+    }
+    .stat-label {
+      font-family: var(--font-ui);
+      font-size: 0.78rem; color: #6A6360;
+      margin-top: 6px; letter-spacing: 0.04em;
+    }
+
+    /* ── Features ── */
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; border: 1px solid var(--rule);
+      border-radius: var(--radius-md); overflow: hidden;
+      margin-top: 56px; background: var(--rule);
+    }
+    .feature-cell {
+      background: var(--c-surface);
+      padding: 32px 28px;
+    }
+    .feature-num {
+      font-family: var(--font-ui); font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--terra); margin-bottom: 16px;
+    }
+    .feature-title {
+      font-family: var(--font-display); font-size: 1.25rem;
+      color: var(--ink); margin-bottom: 10px;
+    }
+    .feature-desc { font-size: 0.875rem; color: var(--muted); line-height: 1.65; font-family: var(--font-ui); }
+
+    /* ── Languages ── */
+    .lang-section {
+      background: var(--ivory-dark);
+      border-block: 1px solid var(--rule);
+    }
+    .lang-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0; border: 1px solid var(--rule);
+      border-radius: var(--radius-md); overflow: hidden;
+      margin-top: 48px; background: var(--rule);
+    }
+    .lang-card {
+      background: var(--c-surface); padding: 20px 16px;
+      text-align: center;
+      transition: background 0.15s;
+    }
+    .lang-card:hover { background: var(--terra-light); }
+    .lang-flag { font-size: 1.8rem; margin-bottom: 7px; line-height: 1; }
+    .lang-name { font-family: var(--font-ui); font-size: 0.8rem; font-weight: 500; color: var(--ink-soft); }
+
+    /* ── Testimonials ── */
+    .testimonials-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 24px; margin-top: 56px;
+    }
+    .testimonial { border-top: 2px solid var(--terra); padding-top: 22px; }
+    .testimonial blockquote {
+      font-family: var(--font-display); font-style: italic;
+      font-size: 1.1rem; color: var(--ink); line-height: 1.55;
+      margin-bottom: 20px;
+    }
+    .testimonial-author { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      display: grid; place-items: center;
+      font-family: var(--font-ui); font-weight: 600; font-size: 0.8rem;
+      color: var(--ivory);
+    }
+    .author-name { font-family: var(--font-ui); font-weight: 600; font-size: 0.875rem; color: var(--ink); }
+    .author-role { font-family: var(--font-ui); font-size: 0.75rem; color: var(--muted); }
+
+    /* ── CTA Banner ── */
+    .cta-banner {
+      background: var(--ink);
+      border-radius: var(--radius-md);
+      padding: 72px 56px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background-image: radial-gradient(circle, rgba(184,92,56,0.12) 1px, transparent 1px);
+      background-size: 24px 24px;
+      pointer-events: none;
+    }
+    .cta-banner .section-title { color: var(--ivory); position: relative; }
+    .cta-banner .section-sub { color: #7A7068; position: relative; margin-inline: auto; text-align: center; margin-bottom: 36px; }
+
+    @media (max-width: 860px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .app-mock { display: none; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; row-gap: 32px; }
+      .stat-item:nth-child(2) { border-right: none; }
+    }
+    @media (max-width: 500px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PAGE: SHOP
+    ══════════════════════════════════════════════════════════ */
+    .shop-header { padding-block: 72px 40px; border-bottom: 1px solid var(--rule); }
+
+    .billing-toggle {
+      display: flex; align-items: center; gap: 12px;
+      margin-top: 24px;
+      font-family: var(--font-ui); font-size: 0.875rem;
+    }
+    .billing-toggle span { color: var(--muted); }
+    .toggle-switch { position: relative; width: 42px; height: 23px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; inset: 0;
+      background: var(--rule); border-radius: 999px;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute;
+      width: 17px; height: 17px; left: 3px; top: 3px;
+      background: var(--muted); border-radius: 50%; transition: transform 0.2s, background 0.2s;
+    }
+    .toggle-switch input:checked ~ .toggle-slider { background: var(--terra-light); }
+    .toggle-switch input:checked ~ .toggle-slider::before { transform: translateX(19px); background: var(--terra); }
+    .toggle-switch input:focus-visible ~ .toggle-slider {
+      outline: 2px solid var(--terra); outline-offset: 2px;
+    }
+    .save-tag {
+      font-family: var(--font-ui); font-size: 0.7rem; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 3px 9px; border-radius: 2px;
+      background: var(--terra-light); color: var(--terra);
+    }
+
+    .plans-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; border: 1px solid var(--rule);
+      border-radius: var(--radius-md); overflow: hidden;
+      margin-top: 56px; background: var(--rule);
+    }
+    .plan-cell {
+      background: var(--c-surface); padding: 36px 28px;
+      display: flex; flex-direction: column;
+      position: relative;
+    }
+    .plan-cell.featured {
+      background: var(--ink);
+    }
+    .plan-badge {
+      font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 3px 10px; border-radius: 2px;
+      background: var(--terra); color: #fff;
+      display: inline-block; margin-bottom: 14px;
+      width: fit-content;
+    }
+    .plan-name {
+      font-family: var(--font-ui); font-size: 0.72rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 12px;
+    }
+    .plan-cell.featured .plan-name { color: #6A6360; }
+    .plan-price { margin-bottom: 6px; }
+    .plan-amount {
+      font-family: var(--font-display); font-size: 3.2rem;
+      color: var(--ink); letter-spacing: -0.02em; line-height: 1;
+    }
+    .plan-cell.featured .plan-amount { color: var(--ivory); }
+    .plan-period {
+      font-family: var(--font-ui); font-size: 0.875rem;
+      color: var(--muted); margin-left: 2px;
+    }
+    .plan-desc {
+      font-family: var(--font-ui); font-size: 0.85rem;
+      color: var(--muted); margin-bottom: 24px;
+      padding-bottom: 24px; border-bottom: 1px solid var(--rule);
+    }
+    .plan-cell.featured .plan-desc { border-color: #2E2B28; }
+    .plan-features {
+      list-style: none; padding: 0; flex: 1; margin-bottom: 28px;
+    }
+    .plan-features li {
+      font-family: var(--font-ui); font-size: 0.875rem;
+      display: flex; gap: 10px; align-items: flex-start;
+      margin-bottom: 11px; color: var(--ink-soft);
+    }
+    .plan-cell.featured .plan-features li { color: #C8C0B0; }
+    .plan-features li::before { content: '—'; color: var(--terra); font-weight: 700; flex-shrink: 0; }
+    .plan-features li.no::before { content: '·'; color: var(--muted); }
+    .plan-features li.no { color: var(--muted) !important; }
+
+    .addon-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 40px;
+    }
+    .addon-card {
+      display: flex; align-items: flex-start;
+      gap: 16px; border-top: 1px solid var(--rule); padding-top: 20px;
+    }
+    .addon-icon {
+      font-size: 1.5rem; flex-shrink: 0; width: 36px; text-align: center;
+      margin-top: 2px;
+    }
+    .addon-name { font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem; color: var(--ink); margin-bottom: 3px; }
+    .addon-detail { font-family: var(--font-ui); font-size: 0.8rem; color: var(--muted); }
+
+    /* Checkout Modal */
+    .overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(28,25,21,0.75); z-index: 200;
+      align-items: center; justify-content: center; padding: 16px;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--c-surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-md);
+      padding: 40px; max-width: 440px; width: 100%;
+      position: relative;
+    }
+    .modal h2 { font-size: 1.6rem; margin-bottom: 6px; }
+    .modal-sub { font-family: var(--font-ui); font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; }
+    .mock-note {
+      background: #FDF4F0; border: 1px solid var(--terra-light);
+      border-radius: var(--radius); padding: 11px 15px;
+      font-family: var(--font-ui); font-size: 0.8rem;
+      color: var(--terra); margin-bottom: 20px;
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-family: var(--font-ui); font-size: 0.72rem;
+      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+    .form-group input, .form-group select {
+      width: 100%; background: var(--ivory);
+      border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 13px; color: var(--ink);
+      font-family: var(--font-ui); font-size: 0.9rem;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--terra); outline: none;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-close {
+      position: absolute; top: 16px; right: 18px;
+      background: none; border: none;
+      color: var(--muted); font-size: 1.4rem; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: var(--ink); }
+
+    @media (max-width: 720px) {
+      .plans-grid { grid-template-columns: 1fr; }
+      .addon-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PAGE: ABOUT
+    ══════════════════════════════════════════════════════════ */
+    .about-header { padding-block: 72px 48px; border-bottom: 1px solid var(--rule); }
+    .about-header h1 {
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      max-width: 680px; line-height: 1.1;
+    }
+    .about-header h1 em { color: var(--terra); }
+
+    .about-two-col {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 64px; align-items: start;
+    }
+    .about-two-col h2 { font-size: clamp(1.6rem, 3vw, 2rem); margin-bottom: 16px; }
+    .about-two-col p { color: var(--muted); font-size: 0.95rem; margin-bottom: 12px; font-family: var(--font-ui); }
+
+    .dl-clean dt {
+      font-family: var(--font-ui); font-size: 0.67rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 3px;
+    }
+    .dl-clean dd {
+      font-family: var(--font-ui); font-size: 0.9rem;
+      color: var(--ink-soft); margin-bottom: 14px;
+    }
+
+    .team-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px; border: 1px solid var(--rule);
+      border-radius: var(--radius-md); overflow: hidden;
+      background: var(--rule); margin-top: 48px;
+    }
+    .team-cell {
+      background: var(--c-surface); padding: 28px 20px; text-align: center;
+    }
+    .team-avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      margin-inline: auto; margin-bottom: 14px;
+      display: grid; place-items: center;
+      font-family: var(--font-ui); font-weight: 600;
+      font-size: 1.1rem; color: var(--ivory);
+    }
+    .team-name { font-family: var(--font-ui); font-weight: 600; font-size: 0.9rem; color: var(--ink); margin-bottom: 3px; }
+    .team-role { font-family: var(--font-ui); font-size: 0.78rem; color: var(--muted); }
+
+    /* Brands */
+    .brands-band { background: var(--ink); padding-block: 88px; }
+    .brands-band .ornament { border-color: #3A3630; }
+    .brands-band .section-title { color: var(--ivory); }
+    .brands-band .section-sub { color: #6A6360; }
+    .brand-cards {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; border: 1px solid #2E2B28;
+      border-radius: var(--radius-md); overflow: hidden;
+      background: #2E2B28; margin-top: 52px;
+    }
+    .brand-card { background: #1C1915; padding: 36px 28px; }
+    .brand-type {
+      font-family: var(--font-ui); font-size: 0.65rem; font-weight: 600;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: #5A5450; margin-bottom: 20px;
+    }
+    .brand-visual { margin-bottom: 20px; }
+    .brand-label { font-family: var(--font-ui); font-size: 0.78rem; font-weight: 600; color: #6A6360; margin-bottom: 6px; }
+    .brand-explain { font-family: var(--font-ui); font-size: 0.82rem; color: #8A837A; line-height: 1.6; }
+    .brand-nizza { font-family: var(--font-ui); font-size: 0.72rem; color: var(--terra); margin-top: 14px; font-weight: 600; letter-spacing: 0.04em; }
+
+    /* Wordmark brand */
+    .brand-wm {
+      font-family: var(--font-display); font-size: 1.9rem;
+      color: var(--ivory); display: flex; align-items: baseline; gap: 2px;
+    }
+    .brand-wm span { color: var(--terra); }
+    .brand-wm-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--terra); margin-left: 1px; margin-bottom: 4px; }
+
+    /* Shape brand – wave SVG */
+    .brand-wave svg { display: block; }
+
+    /* Colour mark */
+    .swatch-row { display: flex; gap: 8px; }
+    .swatch {
+      width: 48px; height: 48px; border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .brand-legal-note {
+      margin-top: 36px; padding: 20px 24px;
+      border: 1px solid #2E2B28; border-radius: var(--radius-md);
+      font-family: var(--font-ui); font-size: 0.82rem; color: #6A6360; line-height: 1.6;
+    }
+
+    @media (max-width: 800px) {
+      .about-two-col { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .brand-cards { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       LEGAL PAGES (License, Privacy, Impressum, A11y)
+    ══════════════════════════════════════════════════════════ */
+    .legal-wrap { max-width: 740px; padding-block: 64px; }
+    .legal-title { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 8px; }
+    .legal-meta { font-family: var(--font-ui); font-size: 0.85rem; color: var(--muted); margin-bottom: 48px; }
+    .legal-toc {
+      background: var(--ivory-dark); border: 1px solid var(--rule);
+      border-radius: var(--radius-md); padding: 22px 26px; margin-bottom: 48px;
+    }
+    .legal-toc h2 { font-size: 0.78rem; font-family: var(--font-ui); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .legal-toc ol { color: var(--muted); font-family: var(--font-ui); font-size: 0.875rem; }
+    .legal-toc a { color: var(--sapphire); }
+
+    .legal-body h2 {
+      font-size: 1.3rem; margin-top: 44px; margin-bottom: 12px;
+      padding-top: 44px; border-top: 1px solid var(--rule);
+    }
+    .legal-body h2:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+    .legal-body h3 { font-family: var(--font-ui); font-size: 0.95rem; font-weight: 600; margin-top: 22px; margin-bottom: 8px; color: var(--ink); }
+    .legal-body p, .legal-body li { font-family: var(--font-ui); font-size: 0.9rem; color: var(--muted); }
+    .legal-body li { margin-bottom: 6px; }
+    .highlight-box {
+      background: var(--ivory-dark); border-left: 3px solid var(--terra);
+      padding: 14px 18px; border-radius: 0 var(--radius) var(--radius) 0;
+      margin-block: 16px; font-family: var(--font-ui); font-size: 0.875rem; color: var(--muted);
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       PAGE: CONTACT
+    ══════════════════════════════════════════════════════════ */
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 72px; align-items: start; padding-block: 64px;
+    }
+    .contact-info h1 { font-size: clamp(2rem, 4vw, 2.8rem); margin-bottom: 14px; }
+    .contact-info > p { font-family: var(--font-ui); font-size: 0.95rem; color: var(--muted); font-style: italic; margin-bottom: 36px; }
+    .contact-row {
+      display: flex; gap: 14px; align-items: flex-start;
+      margin-bottom: 20px; padding-bottom: 20px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .contact-row:last-of-type { border-bottom: none; }
+    .contact-icon { font-size: 1rem; margin-top: 2px; flex-shrink: 0; width: 20px; text-align: center; }
+    .contact-key { font-family: var(--font-ui); font-size: 0.67rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+    .contact-val { font-family: var(--font-ui); font-size: 0.875rem; color: var(--ink-soft); }
+
+    .contact-form-card {
+      background: var(--c-surface); border: 1px solid var(--rule);
+      border-radius: var(--radius-md); padding: 36px;
+    }
+    .contact-form-card h2 { font-size: 1.4rem; margin-bottom: 24px; }
+    .form-success {
+      display: none; background: #F0F7ED;
+      border: 1px solid var(--sage); border-radius: var(--radius);
+      padding: 14px 18px; font-family: var(--font-ui); font-size: 0.875rem;
+      color: var(--sage);
+    }
+    textarea {
+      width: 100%; background: var(--ivory);
+      border: 1px solid var(--rule); border-radius: var(--radius);
+      padding: 10px 13px; color: var(--ink);
+      font-family: var(--font-ui); font-size: 0.9rem;
+      resize: vertical; transition: border-color 0.15s;
+    }
+    textarea:focus { border-color: var(--terra); outline: none; }
+
+    @media (max-width: 720px) {
+      .contact-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       MEDIA TABLE
+    ══════════════════════════════════════════════════════════ */
+    .media-table {
+      width: 100%; border-collapse: collapse;
+      font-family: var(--font-ui); font-size: 0.82rem; margin-top: 28px;
+    }
+    .media-table th {
+      background: var(--ivory-dark); text-align: left;
+      padding: 9px 13px; font-size: 0.68rem; font-weight: 600;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+      border-bottom: 1px solid var(--rule);
+    }
+    .media-table td { padding: 9px 13px; border-bottom: 1px solid var(--rule); color: var(--muted); vertical-align: top; }
+    .media-table tr:last-child td { border-bottom: none; }
+    .media-table tr:hover td { background: var(--ivory-dark); }
+
+    /* ══════════════════════════════════════════════════════════
+       COOKIE BANNER
+    ══════════════════════════════════════════════════════════ */
+    .cookie-banner {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--ink); border-top: 1px solid #2E2B28;
+      padding: 18px 24px; z-index: 150;
+      display: flex; align-items: center;
+      justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    }
+    .cookie-banner p { font-family: var(--font-ui); font-size: 0.82rem; color: #8A837A; flex: 1; min-width: 200px; }
+    .cookie-banner a { color: #B8AA98; }
+    .cookie-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .cookie-banner.hidden { display: none; }
+
+    /* ══════════════════════════════════════════════════════════
+       ACCESSIBILITY
+    ══════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+    }
+    @media print {
+      .site-header, .site-footer, .cookie-banner { display: none; }
+      body { background: #fff; color: #000; }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="skip-link" href="#main-content">Zum Hauptinhalt springen</a>
+
+  <!-- ══════════════════════════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <div class="container nav-inner">
+
+      <a class="logo" href="#" onclick="showPage('home')" aria-label="LinguaFlow – zur Startseite">
+        <span class="logo-word">Lingua<span>Flow</span></span>
+        <span class="logo-dot" aria-hidden="true"></span>
+      </a>
+
+      <button class="nav-toggle" aria-controls="main-nav" aria-expanded="false" aria-label="Navigation öffnen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <nav aria-label="Hauptnavigation">
+        <ul class="nav-links" id="main-nav" role="list">
+          <li><a href="#" onclick="showPage('home')" data-page="home" aria-current="page">Startseite</a></li>
+          <li><a href="#" onclick="showPage('shop')" data-page="shop">Shop</a></li>
+          <li><a href="#" onclick="showPage('about')" data-page="about">Über uns</a></li>
+          <li><a href="#" onclick="showPage('license')" data-page="license">Lizenz</a></li>
+          <li><a href="#" onclick="showPage('privacy')" data-page="privacy">Datenschutz</a></li>
+          <li><a href="#" onclick="showPage('contact')" data-page="contact">Kontakt</a></li>
+          <li><a href="#" onclick="showPage('impressum')" data-page="impressum">Impressum</a></li>
+          <li><a href="#" onclick="showPage('credits')" data-page="credits">Bildnachweis</a></li>
+        </ul>
+      </nav>
+
+      <a href="#" class="nav-cta" onclick="showPage('shop')" aria-label="LinguaFlow kostenlos starten">Kostenlos starten</a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════════════
+       MAIN
+  ══════════════════════════════════════════════════════════ -->
+  <main id="main-content" tabindex="-1">
+
+    <!-- ════════════════════ HOME ════════════════════ -->
+    <div id="page-home" class="page active" role="region" aria-label="Startseite">
+
+      <!-- Hero -->
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="container">
+          <div class="hero-inner">
+            <div>
+              <div class="hero-kicker" aria-label="Neu">Neu — KI-Konversationspartner</div>
+              <h1 class="hero-title" id="hero-heading">
+                Die Sprache<br>
+                die dich <em>weiterbringt.</em>
+              </h1>
+              <p class="hero-lead">
+                LinguaFlow verbindet wissenschaftlich fundiertes Lernen mit KI-gestützter Konversation — für Berufstätige, die wirklich sprechen wollen.
+              </p>
+              <div class="hero-actions">
+                <a href="#" class="btn btn-primary" onclick="showPage('shop')">Jetzt loslegen</a>
+                <a href="#" class="btn btn-outline" onclick="showPage('about')">Mehr erfahren</a>
+                <small>Keine Kreditkarte nötig</small>
+              </div>
+            </div>
+
+            <div class="app-mock" aria-hidden="true">
+              <div class="mock-toolbar">
+                <span class="mock-dot" style="background:#C96A4E;"></span>
+                <span class="mock-dot" style="background:#C9A84E;margin-left:4px;"></span>
+                <span class="mock-dot" style="background:#4A8A41;margin-left:4px;"></span>
+                <span class="mock-title" style="margin-left:10px;">LinguaFlow — Lektion 12: Japanisch</span>
+              </div>
+              <div class="mock-body">
+                <div class="mock-lesson">
+                  <div class="mock-lang">🇯🇵 Japanisch</div>
+                  <div class="mock-phrase">おはようございます</div>
+                  <div class="mock-trans">Guten Morgen</div>
+                </div>
+                <div class="mock-lesson" style="border-color:var(--sapphire);">
+                  <div class="mock-lang" style="color:var(--sapphire);">🇫🇷 Französisch</div>
+                  <div class="mock-phrase">Comment allez-vous ?</div>
+                  <div class="mock-trans">Wie geht es Ihnen?</div>
+                </div>
+                <div style="margin-top:20px;">
+                  <div class="mock-progress-label">
+                    <span>Tagesfortschritt</span><span>62 %</span>
+                  </div>
+                  <div class="mock-track" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="62 Prozent">
+                    <div class="mock-fill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Stats -->
+      <div class="stats-band" aria-label="LinguaFlow in Zahlen">
+        <div class="container">
+          <dl class="stats-grid">
+            <div class="stat-item">
+              <dd class="stat-number">120K+</dd>
+              <dt class="stat-label">Aktive Nutzer</dt>
+            </div>
+            <div class="stat-item">
+              <dd class="stat-number">42</dd>
+              <dt class="stat-label">Sprachen</dt>
+            </div>
+            <div class="stat-item">
+              <dd class="stat-number">8 Mio.</dd>
+              <dt class="stat-label">Abgeschlossene Lektionen</dt>
+            </div>
+            <div class="stat-item">
+              <dd class="stat-number">4,9 ★</dd>
+              <dt class="stat-label">Durchschnittsbewertung</dt>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Features -->
+      <section aria-labelledby="features-heading">
+        <div class="container">
+          <div class="ornament ornament-left">Funktionen</div>
+          <h2 class="section-title" id="features-heading">Was LinguaFlow besonders macht</h2>
+          <div class="features-grid">
+            <article class="feature-cell">
+              <div class="feature-num">01</div>
+              <h3 class="feature-title">KI-Konversationspartner</h3>
+              <p class="feature-desc">Übe Alltagsgespräche rund um die Uhr mit einem adaptiven KI-Gesprächspartner, der sich an dein Niveau und deine Interessen anpasst.</p>
+            </article>
+            <article class="feature-cell">
+              <div class="feature-num">02</div>
+              <h3 class="feature-title">Aussprachetraining</h3>
+              <p class="feature-desc">Echtzeit-Feedback auf deine Aussprache per KI-Phonemanalyse — mit visuellen Lautdiagrammen und Verbesserungsvorschlägen.</p>
+            </article>
+            <article class="feature-cell">
+              <div class="feature-num">03</div>
+              <h3 class="feature-title">Adaptiver Lernpfad</h3>
+              <p class="feature-desc">Der Algorithmus analysiert deine Schwächen und richtet jede Einheit individuell auf deinen Lernstil, dein Tempo und deine Ziele aus.</p>
+            </article>
+            <article class="feature-cell">
+              <div class="feature-num">04</div>
+              <h3 class="feature-title">Offline-Modus</h3>
+              <p class="feature-desc">Lade Lektionen herunter und lerne ohne Internetverbindung — im Zug, im Flugzeug, auf Reisen. Fortschritte werden beim nächsten Sync übertragen.</p>
+            </article>
+            <article class="feature-cell">
+              <div class="feature-num">05</div>
+              <h3 class="feature-title">Fortschritts-Dashboard</h3>
+              <p class="feature-desc">Visualisiere deinen Lernfortschritt, Vokabelwachstum und Lernstreaks — professionell aufbereitet und motivierend dargestellt.</p>
+            </article>
+            <article class="feature-cell">
+              <div class="feature-num">06</div>
+              <h3 class="feature-title">Zertifikate & Nachweise</h3>
+              <p class="feature-desc">Erhalte verifizierbare Sprachzertifikate mit QR-Code — ideal für Bewerbungsunterlagen und Karrieregespräche.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Languages -->
+      <section class="lang-section" aria-labelledby="lang-heading">
+        <div class="container">
+          <div class="ornament ornament-left">Sprachen</div>
+          <h2 class="section-title" id="lang-heading">42 Sprachen — von Häufig bis Selten</h2>
+          <p class="section-sub">Von Spanisch für die Karriere bis Japanisch aus Leidenschaft.</p>
+          <div class="lang-grid" role="list">
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇩🇪</div><div class="lang-name">Deutsch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇬🇧</div><div class="lang-name">Englisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇫🇷</div><div class="lang-name">Französisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇪🇸</div><div class="lang-name">Spanisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇮🇹</div><div class="lang-name">Italienisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇵🇹</div><div class="lang-name">Portugiesisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇯🇵</div><div class="lang-name">Japanisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇰🇷</div><div class="lang-name">Koreanisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇨🇳</div><div class="lang-name">Mandarin</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇷🇺</div><div class="lang-name">Russisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇵🇱</div><div class="lang-name">Polnisch</div></div>
+            <div class="lang-card" role="listitem"><div class="lang-flag" aria-hidden="true">🇸🇦</div><div class="lang-name">Arabisch</div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Testimonials -->
+      <section aria-labelledby="testimonials-heading">
+        <div class="container">
+          <div class="ornament ornament-left">Stimmen</div>
+          <h2 class="section-title" id="testimonials-heading">Was unsere Community sagt</h2>
+          <div class="testimonials-grid">
+            <article class="testimonial">
+              <blockquote>„Nach 3 Monaten LinguaFlow habe ich mein erstes Jobinterview auf Spanisch bestanden. Der KI-Konversationspartner ist beeindruckend realistisch."</blockquote>
+              <div class="testimonial-author">
+                <div class="avatar" style="background:var(--terra);" aria-hidden="true">MK</div>
+                <div>
+                  <div class="author-name">Maria K.</div>
+                  <div class="author-role">Unternehmensberaterin, Wien</div>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial">
+              <blockquote>„Das Aussprachetraining ist ein Game-Changer. Endlich höre ich auf, mich für meinen Akzent zu entschuldigen."</blockquote>
+              <div class="testimonial-author">
+                <div class="avatar" style="background:var(--sapphire);" aria-hidden="true">TH</div>
+                <div>
+                  <div class="author-name">Thomas H.</div>
+                  <div class="author-role">Ingenieur, München</div>
+                </div>
+              </div>
+            </article>
+            <article class="testimonial">
+              <blockquote>„Der Freemium-Plan gibt einem schon sehr viel. Die Pro-Version lohnt sich aber auf jeden Fall — besonders das Dashboard."</blockquote>
+              <div class="testimonial-author">
+                <div class="avatar" style="background:var(--sage);" aria-hidden="true">SN</div>
+                <div>
+                  <div class="author-name">Sophie N.</div>
+                  <div class="author-role">Studentin, Graz</div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section aria-labelledby="cta-heading">
+        <div class="container">
+          <div class="cta-banner">
+            <div class="ornament" style="color:#5A5450;border-color:#3A3630;margin-bottom:16px;">Jetzt starten</div>
+            <h2 class="section-title" id="cta-heading">Bereit für deine erste Lektion?</h2>
+            <p class="section-sub">Kostenlos loslegen — Upgrade jederzeit möglich.</p>
+            <a href="#" class="btn btn-primary" onclick="showPage('shop')" style="margin-top:32px;">Gratis-Konto erstellen</a>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /home -->
+
+    <!-- ════════════════════ SHOP ════════════════════ -->
+    <div id="page-shop" class="page" role="region" aria-label="Shop">
+
+      <div class="container">
+        <div class="shop-header">
+          <div class="ornament ornament-left">Preise</div>
+          <h1 class="section-title">Wähle deinen Plan</h1>
+          <p class="section-sub">Starte kostenlos und upgrade, wenn du bereit bist.</p>
+          <div class="billing-toggle" aria-label="Abrechnungszeitraum wählen">
+            <span id="lbl-monthly">Monatlich</span>
+            <label class="toggle-switch" aria-label="Auf jährliche Abrechnung wechseln">
+              <input type="checkbox" id="billing-toggle" onchange="toggleBilling(this)" />
+              <span class="toggle-slider"></span>
+            </label>
+            <span id="lbl-yearly">Jährlich</span>
+            <span class="save-tag" aria-live="polite">2 Monate gratis</span>
+          </div>
+        </div>
+
+        <div class="plans-grid" aria-label="Abonnement-Pläne">
+
+          <article class="plan-cell" aria-label="Gratis-Plan">
+            <div class="plan-name">Gratis</div>
+            <div class="plan-price">
+              <span class="plan-amount">€0</span>
+              <span class="plan-period">/ Monat</span>
+            </div>
+            <p class="plan-desc">Ideal zum Kennenlernen. Keine Kreditkarte nötig.</p>
+            <ul class="plan-features" aria-label="Enthaltene Funktionen">
+              <li>3 Sprachen zur Auswahl</li>
+              <li>10 Lektionen pro Monat</li>
+              <li>Basis-Vokabeltrainer</li>
+              <li>Community-Forum</li>
+              <li class="no">KI-Konversationspartner</li>
+              <li class="no">Aussprachetraining</li>
+              <li class="no">Offline-Modus</li>
+              <li class="no">Zertifikate</li>
+            </ul>
+            <a href="#" class="btn btn-outline" onclick="openCheckout('Gratis','0')" aria-label="Gratis-Konto erstellen">Gratis starten</a>
+          </article>
+
+          <article class="plan-cell featured" aria-label="Pro-Plan – Empfohlen">
+            <div class="plan-badge" aria-label="Beliebtester Plan">Beliebtester Plan</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">
+              <span class="plan-amount" id="pro-price">€9,99</span>
+              <span class="plan-period" id="pro-period">/ Monat</span>
+            </div>
+            <p class="plan-desc">Für ernsthaftes Sprachenlernen mit KI-Unterstützung.</p>
+            <ul class="plan-features" aria-label="Enthaltene Funktionen">
+              <li>Alle 42 Sprachen</li>
+              <li>Unbegrenzte Lektionen</li>
+              <li>KI-Konversationspartner</li>
+              <li>Aussprachetraining</li>
+              <li>Adaptiver Lernpfad</li>
+              <li>Offline-Modus</li>
+              <li>Fortschritts-Zertifikate</li>
+              <li class="no">Team-Dashboard</li>
+            </ul>
+            <a href="#" class="btn btn-primary" onclick="openCheckout('Pro','9,99')" aria-label="Pro-Plan wählen">Pro wählen</a>
+          </article>
+
+          <article class="plan-cell" aria-label="Business-Plan">
+            <div class="plan-name">Business</div>
+            <div class="plan-price">
+              <span class="plan-amount" id="biz-price">€29,99</span>
+              <span class="plan-period" id="biz-period">/ Monat</span>
+            </div>
+            <p class="plan-desc">Für Teams, Unternehmen und Bildungseinrichtungen.</p>
+            <ul class="plan-features" aria-label="Enthaltene Funktionen">
+              <li>Alles aus Pro</li>
+              <li>Bis zu 25 Nutzer-Lizenzen</li>
+              <li>Team-Dashboard</li>
+              <li>API-Zugang</li>
+              <li>Prioritäts-Support</li>
+              <li>SCORM-Export</li>
+              <li>Benutzerdefinierte Lernpfade</li>
+              <li>Rechnungsstellung</li>
+            </ul>
+            <a href="#" class="btn btn-sapphire" onclick="openCheckout('Business','29,99')" aria-label="Business-Plan wählen">Business wählen</a>
+          </article>
+        </div>
+
+        <!-- Add-ons -->
+        <section style="margin-top:80px;" aria-labelledby="addons-h">
+          <div class="ornament ornament-left">Erweiterungen</div>
+          <h2 id="addons-h" class="section-title" style="font-size:clamp(1.6rem,3vw,2rem);">Optionale Add-ons</h2>
+          <div class="addon-grid">
+            <div class="addon-card">
+              <div class="addon-icon" aria-hidden="true">🧑‍🏫</div>
+              <div>
+                <div class="addon-name">Live-Tutoring</div>
+                <div class="addon-detail">€19,99 / Stunde — 1:1-Stunden mit Muttersprachlern</div>
+              </div>
+            </div>
+            <div class="addon-card">
+              <div class="addon-icon" aria-hidden="true">📜</div>
+              <div>
+                <div class="addon-name">Offizielles Zertifikat</div>
+                <div class="addon-detail">€14,99 einmalig — druckbares Zertifikat mit QR-Code</div>
+              </div>
+            </div>
+            <div class="addon-card">
+              <div class="addon-icon" aria-hidden="true">📚</div>
+              <div>
+                <div class="addon-name">Fachvokabular-Pack</div>
+                <div class="addon-detail">€4,99 / Pack — Branchen-Wortschatz (Recht, Medizin, IT)</div>
+              </div>
+            </div>
+            <div class="addon-card">
+              <div class="addon-icon" aria-hidden="true">🎧</div>
+              <div>
+                <div class="addon-name">Podcast-Lernmodus</div>
+                <div class="addon-detail">€2,99 / Monat — authentische Podcasts mit KI-Analyse</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div><!-- /shop -->
+
+    <!-- ════════════════════ ABOUT ════════════════════ -->
+    <div id="page-about" class="page" role="region" aria-label="Über uns">
+
+      <div class="container">
+        <div class="about-header">
+          <div class="ornament ornament-left">Über LinguaFlow</div>
+          <h1>Wir glauben, dass jede<br><em>Sprache eine Brücke</em> zur Welt ist.</h1>
+        </div>
+      </div>
+
+      <section>
+        <div class="container">
+          <div class="about-two-col">
+            <div>
+              <h2>Unsere Geschichte</h2>
+              <p>LinguaFlow wurde 2026 in Wien gegründet. Die Idee dahinter: Eine intelligente Sprachlern-App, die wie ein geduldiger, persönlicher Sprachlehrer funktioniert und sich perfekt an den eigenen Lernfortschritt anpasst.</p>
+              <p>Heute betreut das 8-köpfige Team der LinguaFlow GmbH (FN 612345 a) von Wien aus bereits über 120.000 Lernende in 38 Ländern.</p>
+            </div>
+            <div>
+              <h2>Unternehmensprofil</h2>
+              <dl class="dl-clean">
+                <dt>Unternehmensname</dt><dd>LinguaFlow GmbH</dd>
+                <dt>Gründungsjahr</dt><dd>2026</dd>
+                <dt>Standort</dt><dd>Währinger Straße 59, 1090 Wien, Österreich</dd>
+                <dt>Mitarbeiter</dt><dd>8 (davon 3 remote)</dd>
+                <dt>Geschäftsmodell</dt><dd>Freemium + monatliches/jährliches Abo</dd>
+                <dt>Zielgruppe</dt><dd>Berufstätige (25–45), Studenten, Reisende</dd>
+              </dl>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Team -->
+      <section style="background:var(--ivory-dark);border-block:1px solid var(--rule);" aria-labelledby="team-h">
+        <div class="container">
+          <div class="ornament ornament-left">Team</div>
+          <h2 class="section-title" id="team-h">Die Menschen hinter LinguaFlow</h2>
+          <div class="team-grid">
+            <article class="team-cell">
+              <div class="team-avatar" style="background:var(--terra);" aria-hidden="true">AV</div>
+              <div class="team-name">Anna Vogel</div>
+              <div class="team-role">Co-CEO, Linguistik</div>
+            </article>
+            <article class="team-cell">
+              <div class="team-avatar" style="background:var(--sapphire);" aria-hidden="true">MR</div>
+              <div class="team-name">Markus Reiter</div>
+              <div class="team-role">Co-CEO, KI-Engineering</div>
+            </article>
+            <article class="team-cell">
+              <div class="team-avatar" style="background:var(--sage);" aria-hidden="true">LB</div>
+              <div class="team-name">Lena Bauer</div>
+              <div class="team-role">Head of Design</div>
+            </article>
+            <article class="team-cell">
+              <div class="team-avatar" style="background:#5A4A3A;" aria-hidden="true">JK</div>
+              <div class="team-name">Jonas Klein</div>
+              <div class="team-role">Lead Developer</div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- Brands – Aufgabe 3 -->
+      <section class="brands-band" aria-labelledby="brands-h">
+        <div class="container">
+          <div class="ornament" style="color:#5A5450;">Markenidentität</div>
+          <h2 class="section-title" id="brands-h">Unsere Marken</h2>
+          <p class="section-sub">LinguaFlow verwendet drei unterschiedliche Markenformen. Alle Marken wurden eigenständig entwickelt und auf Kollisionen mit bestehenden Marken geprüft via EUIPO eSearch, TMview und Madrid Monitor (Nizza-Klassen 41 und 42).</p>
+
+          <div class="brand-cards">
+
+            <!-- 1. Wortbildmarke -->
+            <article class="brand-card" aria-labelledby="b1-h">
+              <div class="brand-type">Marke 1 – Wortbildmarke</div>
+              <div class="brand-visual">
+                <div class="brand-wm" aria-label="LinguaFlow-Logo: Schriftzug mit terrakottafarbenem Punkt">
+                  Lingua<span>Flow</span>
+                  <span class="brand-wm-dot" aria-hidden="true"></span>
+                </div>
+              </div>
+              <h3 id="b1-h" class="brand-label">LinguaFlow + Punkt</h3>
+              <p class="brand-explain">Kombinationsmarke aus dem Schriftzug „LinguaFlow" in einer klassischen Serifenschrift und einem abschließenden, terrakottafarbenen Punkt. Primäres Markenzeichen für das Produkt, die Website und die Außenkommunikation. Verbindet die Bildmarke (Farbpunkt) mit der Wortmarke zu einer eigenständigen Form.</p>
+              <p class="brand-nizza">Nizza-Klassen: 41 (Bildung, Sprachunterricht), 42 (Software, KI-Dienste)</p>
+            </article>
+
+            <!-- 2. Bildmarke – Wellenform -->
+            <article class="brand-card" aria-labelledby="b2-h">
+              <div class="brand-type">Marke 2 – Bildmarke</div>
+              <div class="brand-visual brand-wave">
+                <svg width="100" height="60" viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg" aria-label="Bildmarke: drei ineinandergreifende abstrakte Schallwellen-Bögen">
+                  <path d="M8 44 Q22 10 36 30 Q50 50 64 18 Q78 -10 92 28" stroke="#B85C38" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+                  <path d="M8 50 Q22 18 36 36 Q50 56 64 24 Q78 -4 92 34" stroke="#2D5078" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+                  <path d="M8 38 Q22 4 36 24 Q50 44 64 12 Q78 -16 92 22" stroke="#4A6741" stroke-width="4.5" fill="none" stroke-linecap="round" opacity="0.5"/>
+                </svg>
+              </div>
+              <h3 id="b2-h" class="brand-label">Die drei Schallwellen</h3>
+              <p class="brand-explain">Die reine Bildmarke besteht aus drei ineinandergreifenden, abstrakten Schallwellen-Bögen, die eigenständig gestaltet wurden. Sie ist unabhängig von der Wortmarke und kann als eigenständiges Markenzeichen verwendet werden, z. B. als App-Icon oder Favicon.</p>
+              <p class="brand-nizza">Nizza-Klassen: 41, 42</p>
+            </article>
+
+            <!-- 3. Farbmarke -->
+            <article class="brand-card" aria-labelledby="b3-h">
+              <div class="brand-type">Marke 3 – Farbmarke</div>
+              <div class="brand-visual">
+                <div class="swatch-row" aria-label="Markenfarbpalette: Terrakotta, Elfenbein, Saphirblau, Salbeigrün">
+                  <div class="swatch" style="background:#B85C38;" title="#B85C38 Terrakotta"></div>
+                  <div class="swatch" style="background:#F5F0E8;" title="#F5F0E8 Elfenbein"></div>
+                  <div class="swatch" style="background:#2D5078;" title="#2D5078 Saphirblau"></div>
+                  <div class="swatch" style="background:#4A6741;" title="#4A6741 Salbeigrün"></div>
+                </div>
+              </div>
+              <h3 id="b3-h" class="brand-label">Terrakotta / Elfenbein / Saphir / Salbei</h3>
+              <p class="brand-explain">Die spezifische Vierfarbkombination aus Terrakotta (#B85C38), Elfenbein (#F5F0E8), Saphirblau (#2D5078) und Salbeigrün (#4A6741) als eigenständige Markenform in einer festgelegten, systematischen Anordnung. Wird konsistent in allen Markenzeichen und Kommunikationsmitteln eingesetzt.</p>
+              <p class="brand-nizza">Nizza-Klassen: 41, 42</p>
+            </article>
+          </div>
+
+          <div class="brand-legal-note" role="note">
+            <strong style="color:#A09890;">Markenrechtlicher Recherchevermerk:</strong> Die umfassende Ähnlichkeitsrecherche in den Registern ergab für die Klassen 41 und 42 keine identischen oder verwechslungsfähig ähnlichen Eintragungen (§ 10 MarkSchG / Art. 8 UMV). Positionierung, Form und Farbwahl wurden bewusst so gewählt, dass keine Verwechslungsgefahr mit bestehenden Sprachlern-Plattformen vorliegt.
+          </div>
+        </div>
+      </section>
+
+      <!-- A11y link -->
+      <section>
+        <div class="container">
+          <div class="card" style="max-width:580px;" role="note">
+            <h2 style="font-size:1.1rem;font-family:var(--font-display);margin-bottom:8px;">Barrierefreiheitserklärung</h2>
+            <p style="font-family:var(--font-ui);font-size:0.875rem;color:var(--muted);margin-bottom:16px;">LinguaFlow ist nach WCAG 2.2 Konformitätsstufe AA gestaltet. Unsere vollständige Barrierefreiheitserklärung finden Sie hier:</p>
+            <a href="#" class="btn btn-outline" onclick="showPage('accessibility')" style="font-size:0.82rem;padding:9px 18px;">Barrierefreiheitserklärung lesen</a>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /about -->
+
+    <!-- ════════════════════ LICENSE ════════════════════ -->
+    <div id="page-license" class="page" role="region" aria-label="Lizenz">
+      <div class="container">
+        <div class="legal-wrap">
+          <div class="ornament ornament-left">Rechtliches</div>
+          <h1 class="legal-title">Lizenz- und Nutzungsbedingungen</h1>
+          <p class="legal-meta">Stand: Mai 2026 | LinguaFlow GmbH, Wien</p>
+
+          <nav class="legal-toc" aria-label="Inhaltsverzeichnis">
+            <h2>Inhaltsverzeichnis</h2>
+            <ol>
+              <li><a href="#lic-1">Gegenstand der Lizenz</a></li>
+              <li><a href="#lic-2">Einräumung von Nutzungsrechten</a></li>
+              <li><a href="#lic-3">Schutzrechte und Eigentumsvorbehalt</a></li>
+              <li><a href="#lic-4">Unzulässige Nutzung (Verbote)</a></li>
+              <li><a href="#lic-5">Gewährleistung und Haftung</a></li>
+              <li><a href="#lic-6">Rücktrittsrecht (Widerrufsrecht) für Verbraucher</a></li>
+              <li><a href="#lic-7">Kündigung</a></li>
+              <li><a href="#lic-8">Anwendbares Recht und Gerichtsstand</a></li>
+            </ol>
+          </nav>
+
+          <div class="legal-body">
+            <h2 id="lic-1">1. Gegenstand der Lizenz</h2>
+            <p>Diese Lizenz- und Nutzungsbedingungen (nachfolgend „Lizenz") regeln die Rechte und Pflichten aus dem Erwerb eines Abonnements der LinguaFlow-Plattform zwischen der LinguaFlow GmbH, Währinger Straße 59, 1090 Wien (nachfolgend „Lizenzgeber") und der Nutzerin oder dem Nutzer (nachfolgend „Lizenznehmer"). Der Dienst umfasst die Bereitstellung der webbasierten und mobilen Sprachlernplattform einschließlich aller darin enthaltenen Lektionen, Funktionen, KI-gestützten Tools, Datenbanken und Benutzeroberflächen.</p>
+
+            <h2 id="lic-2">2. Einräumung von Nutzungsrechten</h2>
+            <p>Mit dem rechtmäßigen Abschluss eines Abonnements räumt der Lizenzgeber dem Lizenznehmer ein nicht-exklusives, nicht übertragbares und zeitlich auf die Dauer des Abonnements befristetes Recht ein, die Plattform wie folgt zu nutzen:</p>
+            <ul>
+              <li>Für private Lernzwecke im Rahmen von Gratis- und Pro-Plänen (Einzelnutzerlizenzen).</li>
+              <li>Im Rahmen von Business-Plänen für die vertraglich vereinbarte Anzahl an Nutzerkonten innerhalb des jeweiligen Unternehmens.</li>
+              <li>Soweit von der Plattform technisch vorgesehen, ist das vorübergehende Herunterladen von Lektionen ausschließlich zum Offline-Gebrauch innerhalb der App gestattet.</li>
+            </ul>
+            <p>Nach Beendigung oder Ablauf des Abonnements erlöschen sämtliche Zugriffs- und Nutzungsrechte automatisch.</p>
+
+            <h2 id="lic-3">3. Schutzrechte und Eigentumsvorbehalt</h2>
+            <p>Alle Rechte, die dem Lizenznehmer nicht ausdrücklich durch diese Lizenz eingeräumt werden, verbleiben vollumfänglich beim Lizenzgeber. Die LinguaFlow GmbH behält sich insbesondere alle weltweiten Rechte an der Software, dem Quellcode, den Algorithmen, den KI-Technologien, den bereitgestellten Lernmaterialien, Grafiken, Markenzeichen sowie der zugrundeliegenden Plattform-Infrastruktur vor. Der Erwerb eines Abonnements gewährt dem Lizenznehmer kein Eigentum an der Software. Anonymisierte Nutzungsdaten dürfen vom Lizenzgeber im Rahmen der gesetzlichen Bestimmungen (Datenschutzerklärung) zur Systemoptimierung verwendet werden.</p>
+
+            <h2 id="lic-4">4. Unzulässige Nutzung (Verbote)</h2>
+            <p>Dem Lizenznehmer ist es ausdrücklich untersagt:</p>
+            <ul>
+              <li>Die Software oder Teile der Inhalte zu vervielfältigen, zu verbreiten oder öffentlich zugänglich zu machen.</li>
+              <li>Automatisierte Systeme oder Software zu verwenden, um Inhalte aus der Plattform zu extrahieren (sogenanntes „Scraping").</li>
+              <li>Die Software zu dekompilieren, zu disassemblieren oder im Wege des Reverse Engineering zu untersuchen, es sei denn, dies ist nach zwingendem anwendbarem Recht zulässig.</li>
+              <li>Zugangsdaten zu den Nutzerkonten an Dritte weiterzugeben oder Dritten die Nutzung zu ermöglichen.</li>
+              <li>Die Inhalte der Gratis- oder Pro-Pläne ohne vorherige schriftliche Zustimmung des Lizenzgebers kommerziell zu verwerten.</li>
+            </ul>
+
+            <h2 id="lic-5">5. Gewährleistung und Haftung</h2>
+            <p>(1) Der Lizenzgeber gewährleistet, dass die Plattform im Wesentlichen den Funktionsbeschreibungen entspricht. Es gelten die gesetzlichen Gewährleistungsrechte. Eine Garantie für einen bestimmten persönlichen Lernerfolg oder das Bestehen von externen Sprachprüfungen wird nicht übernommen.</p>
+            <p>(2) Der Lizenzgeber strebt eine Verfügbarkeit der Plattform von 99,5 % im Jahresdurchschnitt an. Ausgenommen hiervon sind notwendige Wartungsarbeiten sowie Ausfälle durch höhere Gewalt.</p>
+            <p>(3) Die LinguaFlow GmbH haftet unbeschränkt für Schäden aus der Verletzung des Lebens, des Körpers oder der Gesundheit, die auf einer vorsätzlichen oder fahrlässigen Pflichtverletzung beruhen.</p>
+            <p>(4) Für sonstige Schäden haftet der Lizenzgeber nur bei Vorsatz oder grober Fahrlässigkeit. Die Haftung für leichte Fahrlässigkeit (ausgenommen Personenschäden) ist, soweit gesetzlich zulässig, ausgeschlossen. Da die Plattform KI-generierte Inhalte nutzt, wird für die absolute Fehlerfreiheit dieser spezifischen, dynamisch generierten Inhalte keine Haftung übernommen, sofern kein grobes Verschulden vorliegt.</p>
+
+            <h2 id="lic-6">6. Rücktrittsrecht (Widerrufsrecht) für Verbraucher</h2>
+            <p>Verbraucher im Sinne des KSchG haben das Recht, binnen 14 Tagen ohne Angabe von Gründen von einem im Fernabsatz geschlossenen Abonnementvertrag zurückzutreten. Die Frist beginnt mit dem Tag des Vertragsabschlusses. Die diesbezüglichen Details und Ausnahmen (insbesondere zum vorzeitigen Erlöschen des Rücktrittsrechts bei sofortiger vollständiger Bereitstellung digitaler Inhalte) richten sich nach dem österreichischen Fern- und Auswärtsgeschäfte-Gesetz (FAGG) und werden in der separaten Widerrufsbelehrung ausgewiesen.</p>
+
+            <h2 id="lic-7">7. Kündigung</h2>
+            <p>Abonnements können von beiden Parteien jederzeit zum Ende der jeweiligen laufenden Abrechnungsperiode (Monat oder Jahr) über die Kontoeinstellungen oder per Textform gekündigt werden.</p>
+
+            <h2 id="lic-8">8. Anwendbares Recht und Gerichtsstand</h2>
+            <p>(1) Es gilt österreichisches Recht unter Ausschluss seiner Verweisungsnormen und des UN-Kaufrechts.</p>
+            <p>(2) Für Streitigkeiten aus oder im Zusammenhang mit diesem Vertrag ist das für 1010 Wien sachlich zuständige Gericht ausschließlich zuständig. Ist der Lizenznehmer Verbraucher im Sinne des KSchG, gilt diese Gerichtsstandvereinbarung nur, wenn er in diesem Gerichtssprengel seinen Wohnsitz, gewöhnlichen Aufenthalt oder Ort der Beschäftigung hat.</p>
+            <p>(3) Alternative Streitbeilegung: Bei Streitigkeiten mit Verbrauchern besteht die Möglichkeit, ein außergerichtliches Schlichtungsverfahren vor der staatlich anerkannten Schlichtungsstelle „Internet Ombudsstelle" (<a href="https://www.ombudsstelle.at" target="_blank" rel="noopener noreferrer">www.ombudsstelle.at</a>) durchzuführen. Der Lizenzgeber entscheidet im Einzelfall, ob er an diesem Verfahren teilnimmt.</p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /license -->
+
+    <!-- ════════════════════ PRIVACY ════════════════════ -->
+    <div id="page-privacy" class="page" role="region" aria-label="Datenschutzerklärung">
+      <div class="container">
+        <div class="legal-wrap">
+          <div class="ornament ornament-left">Datenschutz</div>
+          <h1 class="legal-title">Datenschutzerklärung</h1>
+          <p class="legal-meta">Stand: Mai 2026 | Gemäß DSGVO (EU) 2016/679 und TKG 2021</p>
+
+          <nav class="legal-toc" aria-label="Inhaltsverzeichnis Datenschutz">
+            <h2>Inhaltsverzeichnis</h2>
+            <ol>
+              <li><a href="#p1">Datenkategorien</a></li>
+              <li><a href="#p2">Rechtmäßigkeit und Zwecke der Verarbeitung</a></li>
+              <li><a href="#p3">Speicherdauer</a></li>
+              <li><a href="#p4">Weitergabe der Daten (Empfänger:innen)</a></li>
+              <li><a href="#p5">Automatisierte Entscheidungsfindung und Profiling</a></li>
+              <li><a href="#p6">Cookies und Tracking (TKG 2021)</a></li>
+              <li><a href="#p7">Kontaktdaten des Verantwortlichen und Datenschutzbeauftragten</a></li>
+              <li><a href="#p8">Ihre Rechte (Betroffenenrechte)</a></li>
+            </ol>
+          </nav>
+
+          <div class="legal-body">
+            <p>Der Schutz Ihrer persönlichen Daten ist der LinguaFlow GmbH ein zentrales Anliegen. Wir behandeln Ihre Daten vertraulich und ausschließlich auf Grundlage der gesetzlichen Bestimmungen (Datenschutz-Grundverordnung – DSGVO, Telekommunikationsgesetz – TKG 2021).</p>
+
+            <h2 id="p1">1. Datenkategorien</h2>
+            <p>Wir verarbeiten personenbezogene Daten, die unter folgende Kategorien fallen:</p>
+            <ul>
+              <li><strong>Nutzerkontodaten:</strong> Name/Firma, E-Mail-Adresse, Benutzername, ausgewählte Sprachen sowie persönliche Lernziele.</li>
+              <li><strong>Lernfortschrittsdaten &amp; Profiling:</strong> Bestelldaten, abgeschlossene Lektionen, Testergebnisse, Übungszeiten und automatisierte Lernprofile.</li>
+              <li><strong>Audiodaten:</strong> Kurzzeitige Sprachaufnahmen über den Mikrofon-Zugriff Ihres Endgeräts (ausschließlich zur Ausspracheanalyse).</li>
+              <li><strong>Technische Nutzungsdaten (Server-Logs):</strong> Browsertyp, Betriebssystem, Uhrzeit sowie gekürzte, pseudonymisierte IP-Adressen.</li>
+              <li><strong>Kontaktdaten:</strong> Angaben bei Anfragen über das Kontaktformular oder per E-Mail (Name, E-Mail-Adresse, Inhalt der Anfrage).</li>
+            </ul>
+
+            <h2 id="p2">2. Rechtmäßigkeit und Zwecke der Verarbeitung</h2>
+            <p>Die Datenverarbeitung erfolgt auf Basis der folgenden rechtlichen Grundlagen und Zwecke:</p>
+
+            <h3>A. Erfüllung des Vertrages (Art. 6 Abs. 1 lit. b DSGVO)</h3>
+            <p>Die von Ihnen bereitgestellten Nutzerkontodaten, Lernfortschrittsdaten sowie Audiodaten sind zur Vertragserfüllung bzw. zur Durchführung vorvertraglicher Maßnahmen erforderlich. Ohne diese Daten können wir die Plattformdienste nicht bereitstellen.</p>
+
+            <h3>B. Wahrung berechtigter Interessen (Art. 6 Abs. 1 lit. f DSGVO)</h3>
+            <p>Wir verarbeiten bestimmte Daten basierend auf unserem berechtigten Interesse, die Plattform sicher und effizient zu betreiben:</p>
+            <ul>
+              <li><strong>Server-Logs:</strong> Zur Gewährleistung der Stabilität, Funktionalität und Sicherheit der Plattform (z. B. Schutz vor Cyberangriffen).</li>
+              <li><strong>Reichweitenmessung (Plausible Analytics):</strong> Zur datenschutzfreundlichen Analyse der Website-Besuche. Dies erfolgt ohne Cookies und ohne Erfassung eindeutiger personenbezogener Daten.</li>
+              <li><strong>Kontaktformulardaten:</strong> Zur effizienten Bearbeitung und Beantwortung Ihrer Kundenserviceanfragen.</li>
+            </ul>
+
+            <h3>C. Einwilligung (Art. 6 Abs. 1 lit. a DSGVO)</h3>
+            <p>Sollten Sie uns Daten freiwillig zur Verfügung stellen, die über die zwingende Vertragserfüllung hinausgehen, verarbeiten wir diese auf Grundlage Ihrer Einwilligung. Sie können diese Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen.</p>
+
+            <h2 id="p3">3. Speicherdauer</h2>
+            <p>Wir speichern Ihre Daten nach folgenden Kriterien:</p>
+            <ul>
+              <li><strong>Nutzerkonto &amp; Lernfortschritt:</strong> Bei einer Kontoauflösung werden diese Daten innerhalb von maximal 90 Tagen endgültig gelöscht. Ausgenommen hiervon sind Daten, die wir aufgrund gesetzlicher Aufbewahrungspflichten (z. B. 7 Jahre Aufbewahrungspflicht für Buchhaltungsunterlagen nach § 132 BAO) länger speichern müssen.</li>
+              <li><strong>Audiodaten:</strong> Werden nur flüchtig im Arbeitsspeicher verarbeitet und nach der Feedback-Generierung sofort gelöscht; es erfolgt keine dauerhafte Speicherung auf unseren Servern.</li>
+              <li><strong>Kontaktanfragen:</strong> Werden nach der endgültigen Erledigung der Anfrage gelöscht, sofern keine steuer- oder unternehmensrechtlichen Nachweispflichten entgegenstehen.</li>
+            </ul>
+
+            <h2 id="p4">4. Weitergabe der Daten (Empfänger:innen)</h2>
+            <p>Für den Betrieb der Plattform ziehen wir vertrauenswürdige Auftragsverarbeiter ein. Wir geben Ihre Daten ausschließlich an folgende Empfänger:innen bzw. Empfängerkategorien weiter:</p>
+            <ul>
+              <li><strong>Hosting und Infrastruktur (Hetzner Cloud, Deutschland):</strong> Für das Hosting der Plattform und der Datenbanken.</li>
+              <li><strong>KI-Schnittstellen (OpenAI Ireland Ltd., Irland):</strong> Zur Bereitstellung der interaktiven Sprachfunktionen. Die Datenverarbeitung erfolgt vertraglich garantiert innerhalb der EU und die Daten werden nicht für das Training der KI-Modelle verwendet.</li>
+              <li><strong>Zahlungsabwicklung (Stripe Payments Europe Ltd., Irland):</strong> Zur Abwicklung von Kreditkarten- und Abonnementzahlungen.</li>
+            </ul>
+            <div class="highlight-box"><strong>Drittlandstransfer:</strong> Ihre Daten werden zum Teil auch außerhalb der EU bzw. des EWR verarbeitet, und zwar in den USA (durch die Stripe Inc. als Muttergesellschaft des Zahlungsdienstleisters). Das angemessene Schutzniveau ergibt sich aus dem Angemessenheitsbeschluss der Europäischen Kommission (EU-US Data Privacy Framework) sowie dem zusätzlichen Abschluss von Standardvertragsklauseln (SCC).</div>
+
+            <h2 id="p5">5. Automatisierte Entscheidungsfindung und Profiling</h2>
+            <p>Wir setzen ein Verfahren zur automatisierten Anpassung der Lerninhalte ein (Art. 22 DSGVO): Um Ihren Lernpfad dynamisch und maßgeschneidert anzupassen, wertet ein Algorithmus Ihre absolvierten Lektionen, Übungszeiten und Testergebnisse aus. Dies dient ausschließlich dem Zweck, Ihnen personalisierte Lehrinhalte anzuzeigen. Da hierbei KI-gestützte Systeme zum Einsatz kommen, haben wir eine umfassende Datenschutz-Folgenabschätzung (Art. 35 DSGVO) durchgeführt. Durch technische Schutzmaßnahmen (wie die Maskierung von Klardaten vor der API-Übermittlung) reduzieren wir das Risiko für Ihre Rechte auf ein Minimum.</p>
+
+            <h2 id="p6">6. Cookies und Tracking (TKG 2021)</h2>
+            <p>Gemäß § 165 Abs. 3 TKG 2021 informieren wir Sie darüber, dass wir ausschließlich technisch zwingend erforderliche Cookies (First-Party-Cookies) einsetzen. Diese dienen einzig dazu, Ihren Login-Status zu halten und Ihre Sprachauswahl zu speichern. Da diese Funktionen vom Nutzer ausdrücklich gewünscht werden, ist hierfür gesetzlich kein Cookie-Banner erforderlich.</p>
+            <div class="highlight-box">Werbe-Cookies von Drittanbietern oder Cross-Site-Tracking-Systeme werden nicht eingesetzt.</div>
+
+            <h2 id="p7">7. Kontaktdaten des Verantwortlichen und Datenschutzbeauftragten</h2>
+            <h3>Verantwortlicher</h3>
+            <p>
+              <strong>LinguaFlow GmbH</strong><br>
+              Währinger Straße 59, 1090 Wien<br>
+              E-Mail: <a href="mailto:datenschutz@linguaflow.at">datenschutz@linguaflow.at</a>
+            </p>
+            <h3>Datenschutzbeauftragter</h3>
+            <p>
+              <strong>Max Mustermann</strong><br>
+              LinguaFlow GmbH<br>
+              Währinger Straße 59, 1090 Wien<br>
+              E-Mail: <a href="mailto:dsb@linguaflow.at">dsb@linguaflow.at</a>
+            </p>
+
+            <h2 id="p8">8. Ihre Rechte (Betroffenenrechte)</h2>
+            <p>Ihnen stehen grundsätzlich die Rechte auf <strong>Auskunft, Berichtigung, Löschung, Einschränkung, Datenübertragbarkeit und Widerspruch</strong> zu. Dafür können Sie sich jederzeit an uns wenden (<a href="mailto:datenschutz@linguaflow.at">datenschutz@linguaflow.at</a>). Sollten wir begründete Zweifel an Ihrer Identität haben, behalten wir uns vor, einen entsprechenden Nachweis einzufordern, um Ihre Daten vor unbefugtem Zugriff Dritter zu schützen.</p>
+            <p>Wenn Sie glauben, dass die Verarbeitung Ihrer Daten gegen das Datenschutzrecht verstößt, können Sie sich bei der Aufsichtsbehörde beschweren. In Österreich ist dies die:</p>
+            <p>
+              <strong>Österreichische Datenschutzbehörde</strong><br>
+              Barichgasse 40–42, 1030 Wien<br>
+              Telefon: <a href="tel:+431521520">+43 1 52 152-0</a><br>
+              E-Mail: <a href="mailto:dsb@dsb.gv.at">dsb@dsb.gv.at</a><br>
+              Web: <a href="https://www.dsb.gv.at" target="_blank" rel="noopener noreferrer">www.dsb.gv.at</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div><!-- /privacy -->
+
+    <!-- ════════════════════ CONTACT ════════════════════ -->
+    <div id="page-contact" class="page" role="region" aria-label="Kontakt">
+      <div class="container">
+        <div class="contact-grid">
+          <div class="contact-info">
+            <div class="ornament ornament-left">Kontakt</div>
+            <h1>Wir freuen uns,<br>von Ihnen zu hören.</h1>
+            <p>Fragen, Feedback, Presse oder Kooperationsanfragen — unser Team antwortet innerhalb von 24 Stunden.</p>
+            <div class="contact-row">
+              <div class="contact-icon" aria-hidden="true">📍</div>
+              <div><div class="contact-key">Adresse</div><div class="contact-val">Währinger Straße 59, 1090 Wien, Österreich</div></div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon" aria-hidden="true">✉️</div>
+              <div><div class="contact-key">E-Mail</div><div class="contact-val"><a href="mailto:hallo@linguaflow.at">hallo@linguaflow.at</a></div></div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon" aria-hidden="true">📞</div>
+              <div><div class="contact-key">Telefon</div><div class="contact-val"><a href="tel:+4312345678">+43 1 234 56 78</a></div></div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon" aria-hidden="true">🕐</div>
+              <div><div class="contact-key">Bürozeiten</div><div class="contact-val">Mo–Fr, 09:00–18:00 Uhr (MEZ)</div></div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon" aria-hidden="true">🛠️</div>
+              <div><div class="contact-key">Support</div><div class="contact-val"><a href="mailto:support@linguaflow.at">support@linguaflow.at</a></div></div>
+            </div>
+            <div class="contact-row">
+              <div class="contact-icon" aria-hidden="true">📰</div>
+              <div><div class="contact-key">Presse</div><div class="contact-val"><a href="mailto:presse@linguaflow.at">presse@linguaflow.at</a></div></div>
+            </div>
+          </div>
+
+          <div class="contact-form-card">
+            <h2>Nachricht senden</h2>
+            <div class="mock-note" role="note">
+              <strong>Hinweis:</strong> Dieses Formular ist zu Demonstrationszwecken gemockt. Es werden keine Daten übertragen.
+            </div>
+            <div id="form-success" class="form-success" role="alert" aria-live="polite">
+              ✓ Vielen Dank! Wir melden uns innerhalb von 24 Stunden.
+            </div>
+            <div id="contact-form">
+              <div class="form-group">
+                <label for="c-name">Ihr Name <span aria-label="Pflichtfeld">*</span></label>
+                <input type="text" id="c-name" required autocomplete="name" placeholder="Anna Muster" />
+              </div>
+              <div class="form-group">
+                <label for="c-email">E-Mail-Adresse <span aria-label="Pflichtfeld">*</span></label>
+                <input type="email" id="c-email" required autocomplete="email" placeholder="anna@beispiel.at" />
+              </div>
+              <div class="form-group">
+                <label for="c-subject">Betreff</label>
+                <select id="c-subject">
+                  <option value="">Bitte wählen…</option>
+                  <option>Technischer Support</option>
+                  <option>Vertrieb / Business-Anfrage</option>
+                  <option>Presse &amp; Medien</option>
+                  <option>Feedback</option>
+                  <option>Sonstiges</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="c-msg">Nachricht <span aria-label="Pflichtfeld">*</span></label>
+                <textarea id="c-msg" required rows="5" placeholder="Ihre Nachricht…"></textarea>
+              </div>
+              <div class="form-group" style="display:flex;gap:10px;align-items:flex-start;">
+                <input type="checkbox" id="c-privacy" required style="margin-top:4px;flex-shrink:0;accent-color:var(--terra);" />
+                <label for="c-privacy" style="font-family:var(--font-ui);font-size:0.82rem;color:var(--muted);text-transform:none;letter-spacing:0;">
+                  Ich habe die <a href="#" onclick="showPage('privacy')">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu. <span aria-label="Pflichtfeld">*</span>
+                </label>
+              </div>
+              <button type="button" class="btn btn-primary" onclick="submitForm()" style="width:100%;justify-content:center;">Nachricht absenden</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /contact -->
+
+    <!-- ════════════════════ IMPRESSUM ════════════════════ -->
+    <div id="page-impressum" class="page" role="region" aria-label="Impressum">
+      <div class="container">
+        <div class="legal-wrap">
+          <div class="ornament ornament-left">Impressum</div>
+          <h1 class="legal-title">Impressum</h1>
+          <p class="legal-meta">Informationen gemäß § 5 E-Commerce-Gesetz (ECG), § 14 Unternehmensgesetzbuch (UGB) und Offenlegungspflicht nach § 25 Mediengesetz (MedienG).</p>
+          <div class="legal-body">
+
+            <div class="highlight-box" role="note" style="margin-bottom:32px;">
+              <strong>Hinweis:</strong> Diese Website wurde im Design und in der technischen Umsetzung unter Nutzung von KI-Assistenz (Claude) erstellt. Sämtliche rechtliche Inhalte wurden unabhängig davon eigenständig verfasst.
+            </div>
+
+            <h2 style="border-top:none;padding-top:0;margin-top:0;">Angaben zum Unternehmen</h2>
+            <p>
+              <strong>LinguaFlow GmbH</strong><br>
+              Währinger Straße 59<br>
+              1090 Wien<br>
+              Österreich
+            </p>
+
+            <h2>Kontakt</h2>
+            <p>
+              Telefon: <a href="tel:+4312345678">+43 1 234 56 78</a><br>
+              E-Mail: <a href="mailto:hallo@linguaflow.at">hallo@linguaflow.at</a>
+            </p>
+
+            <h2>Vertretungsberechtigte Geschäftsführung</h2>
+            <p>Anna Vogel, Markus Reiter</p>
+
+            <h2>Firmenbuchdaten</h2>
+            <p>
+              Firmenbuchnummer: FN 612345 a<br>
+              Firmenbuchgericht: Handelsgericht Wien<br>
+              UID-Nummer: ATU12345678
+            </p>
+
+            <h2>Unternehmensgegenstand</h2>
+            <p>Entwicklung und Vertrieb von Software zur Sprachausbildung; Betrieb einer Online-Lernplattform; Erbringung von E-Learning-Dienstleistungen.</p>
+
+            <h2>Gewerbe- und berufsrechtliche Angaben</h2>
+            <p>
+              Mitglied der Wirtschaftskammer Wien<br>
+              Fachgruppe: Unternehmensberatung, Buchhaltung und Informationstechnologie (UBIT)<br>
+              Aufsichtsbehörde (Gewerbebehörde): Magistratisches Bezirksamt des 9. Bezirkes, Wien<br>
+              Anwendbare Rechtsvorschriften: Gewerbeordnung 1994 (GewO), abrufbar unter <a href="https://www.ris.bka.gv.at" target="_blank" rel="noopener noreferrer">www.ris.bka.gv.at</a>
+            </p>
+
+            <h2>Alternative Streitbeilegung</h2>
+            <p>Bei Streitigkeiten mit Verbrauchern besteht die Möglichkeit, ein außergerichtliches Schlichtungsverfahren vor der staatlich anerkannten Schlichtungsstelle „Internet Ombudsstelle" (<a href="https://www.ombudsstelle.at" target="_blank" rel="noopener noreferrer">www.ombudsstelle.at</a>) durchzuführen. Die LinguaFlow GmbH entscheidet im Einzelfall, ob sie an diesem Verfahren teilnimmt.</p>
+
+            <h2>Urheberrecht</h2>
+            <p>Alle Inhalte dieser Website unterliegen dem österreichischen Urheberrecht (UrhG). Jede Form der Vervielfältigung, Bearbeitung und Verbreitung bedarf der vorherigen schriftlichen Zustimmung der LinguaFlow GmbH.</p>
+
+            <h2>Offenlegung nach § 25 Mediengesetz (Medieninhaber)</h2>
+            <p>
+              Medieninhaber und Herausgeber: LinguaFlow GmbH, Währinger Straße 59, 1090 Wien<br>
+              Geschäftsführung: Anna Vogel, Markus Reiter<br>
+              Unternehmensgegenstand: Sprachlern-Software und Online-Bildungsdienstleistungen<br>
+              Blattlinie: Die Website und die dazugehörigen digitalen Dienste dienen der Information über die Sprachlern-Plattform LinguaFlow sowie der Bewerbung und dem Vertrieb eigenständiger Produkte und Dienstleistungen.
+            </p>
+
+          </div>
+        </div>
+      </div>
+    </div><!-- /impressum -->
+
+    <!-- ════════════════════ ACCESSIBILITY ════════════════════ -->
+    <div id="page-accessibility" class="page" role="region" aria-label="Barrierefreiheitserklärung">
+      <div class="container">
+        <div style="max-width:760px;padding-block:64px;">
+
+          <div class="ornament ornament-left">Barrierefreiheit</div>
+          <h1 class="legal-title">Barrierefreiheitserklärung</h1>
+          <p class="legal-meta">Stand: Mai 2026 | LinguaFlow GmbH, Wien | Gemäß WCAG 2.2, Konformitätsstufe AA</p>
+
+          <!-- ── 1. ERKLÄRUNG ZUR BARRIEREFREIHEIT ── -->
+          <div class="legal-body">
+
+            <h2 style="border-top:none;padding-top:0;margin-top:0;">1. Erklärung zur Barrierefreiheit</h2>
+            <p>Uns ist es ein großes Anliegen, die Website <strong>linguaflow.at</strong> für alle Menschen frei zugänglich zu machen. Daher arbeiten wir kontinuierlich daran, unseren Webauftritt barrierefrei zu gestalten – ganz im Einklang mit den nationalen Vorschriften zur Umsetzung der EU-Richtlinie 2016/2102. Diese Erklärung gilt für das gesamte Webangebot der LinguaFlow GmbH.</p>
+
+            <!-- ── 2. STAND DER VEREINBARKEIT ── -->
+            <h2 id="pruefung">2. Stand der Vereinbarkeit mit den Anforderungen</h2>
+            <p>Diese Website ist wegen der folgenden Unvereinbarkeiten und Ausnahmen <strong>teilweise</strong> mit der Konformitätsstufe AA der „Richtlinien für barrierefreie Webinhalte – WCAG 2.2" vereinbar.</p>
+
+            <h3>Nicht barrierefreie Inhalte</h3>
+            <p>Die nachstehend aufgeführten Inhalte sind aus den folgenden Gründen nicht barrierefrei:</p>
+            <ul>
+              <li>Fremdsprachige Beispielsätze im App-Mock (Japanisch, Französisch) sind derzeit nicht mit einem Sprachattribut ausgezeichnet. Screenreader lesen diese Passagen in der Seitensprache Deutsch vor. Behebung geplant für Q3 2026.</li>
+              <li>Fehlermeldungen im Kontaktformular und im Checkout werden als Alert ausgegeben, sind jedoch nicht programmatisch mit dem jeweiligen Eingabefeld verknüpft. Behebung geplant für Q3 2026.</li>
+              <li>Feldbezogene Eingabe-Hinweise (z.&nbsp;B. Format der E-Mail-Adresse) fehlen noch. Nutzerinnen und Nutzer erhalten derzeit nur allgemeine Fehlermeldungen. Behebung geplant für Q3 2026.</li>
+            </ul>
+
+            <!-- ── 3. FEEDBACK UND KONTAKT ── -->
+            <h2 id="a11y-contact">3. Feedback und Kontaktangaben</h2>
+            <p>Wir entwickeln die Inhalte und Funktionen unserer Website ständig weiter. Sollten Sie dennoch auf Barrieren stoßen, die Ihnen die Nutzung erschweren, freuen wir uns über Ihren Hinweis.</p>
+            <p>Bitte senden Sie uns dazu eine kurze Beschreibung des Problems sowie den Link (URL) der betroffenen Seite per E-Mail.</p>
+            <ul>
+              <li><strong>Ansprechperson:</strong> Lena Bauer, Head of Design</li>
+              <li><strong>E-Mail:</strong> <a href="mailto:barrierefreiheit@linguaflow.at">barrierefreiheit@linguaflow.at</a></li>
+              <li><strong>Telefon:</strong> <a href="tel:+4312345678">+43 1 234 56 78</a></li>
+              <li><strong>Postadresse:</strong> LinguaFlow GmbH, Währinger Straße 59, 1090 Wien</li>
+            </ul>
+
+            <!-- ── 4. DURCHSETZUNGSVERFAHREN ── -->
+            <h2 id="a11y-complaint">4. Ihr Weg zur Beschwerde (Durchsetzungsverfahren)</h2>
+            <p>Sollte unsere Antwort auf Ihr Anliegen nicht zufriedenstellend sein, haben Sie die Möglichkeit, eine Beschwerde bei der Österreichischen Forschungsförderungsgesellschaft mbH (FFG) einzureichen.</p>
+            <p><a href="https://www.digitalbarrierefrei.at/de/beschwerdestelle/kontaktformular-beschwerdestelle" target="_blank" rel="noopener noreferrer">Kontaktformular der Beschwerdestelle</a></p>
+
+            <p style="margin-top:24px;padding-top:24px;border-top:1px solid var(--rule);font-family:var(--font-ui);font-size:0.82rem;color:var(--muted);">
+              Diese Barrierefreiheitserklärung wurde zuletzt am <strong>Mai 2026</strong> überprüft und aktualisiert. Nächste planmäßige Überprüfung: <strong>Mai 2027</strong>.
+            </p>
+          </div>
+
+        </div><!-- /wide wrap -->
+      </div>
+    </div><!-- /accessibility -->
+
+    <!-- ════════════════════ CREDITS ════════════════════ -->
+    <div id="page-credits" class="page" role="region" aria-label="Urheberrechtshinweise">
+      <div class="container">
+        <div style="max-width:960px;padding-block:64px;">
+
+          <div class="ornament ornament-left">Urheberrecht</div>
+          <h1 class="legal-title">Urheberrechtshinweise &amp; Bildnachweis</h1>
+          <p class="legal-meta">Stand: Mai 2026 | LinguaFlow GmbH, Wien</p>
+
+          <div class="legal-body">
+            <h2 style="border-top:none;padding-top:0;margin-top:0;">Allgemeines</h2>
+            <p>Alle Medien auf dieser Website sind Eigentum der LinguaFlow GmbH oder für die kommerzielle Nutzung lizenziert. Die folgende Tabelle dokumentiert Herkunft, Urheber und Lizenzen aller verwendeten Dateien. Bei Creative-Commons-Lizenzen gelten die jeweiligen Bedingungen. Werke unter CC0 (Public Domain) sind frei von urheberrechtlichen Einschränkungen.</p>
+          </div>
+
+          <!-- Credits table -->
+          <div style="overflow-x:auto;margin-top:32px;" role="region" aria-label="Mediennachweise und Lizenztabelle" tabindex="0">
+            <table class="media-table" aria-label="Urheberrechtshinweise – alle verwendeten Medien">
+              <thead>
+                <tr>
+                  <th scope="col" style="width:14%;">Medienart</th>
+                  <th scope="col" style="width:22%;">Verwendetes Element</th>
+                  <th scope="col" style="width:28%;">Quelle / Link</th>
+                  <th scope="col" style="width:20%;">Urheber / Autor</th>
+                  <th scope="col">Lizenz</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Schriftarten -->
+                <tr>
+                  <td colspan="5" style="background:var(--ivory-dark);font-family:var(--font-ui);font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:8px 13px;">Schriftarten</td>
+                </tr>
+                <tr>
+                  <td>Schriftart</td>
+                  <td>DM Serif Display</td>
+                  <td><a href="https://fonts.google.com/specimen/DM+Serif+Display" target="_blank" rel="noopener noreferrer">Google Fonts – DM Serif Display</a></td>
+                  <td>Colophon Foundry</td>
+                  <td>SIL Open Font License 1.1 (OFL)</td>
+                </tr>
+                <tr>
+                  <td>Schriftart</td>
+                  <td>Instrument Sans</td>
+                  <td><a href="https://fonts.google.com/specimen/Instrument+Sans" target="_blank" rel="noopener noreferrer">Google Fonts – Instrument Sans</a></td>
+                  <td>Rodrigo Fuenzalida</td>
+                  <td>SIL Open Font License 1.1 (OFL)</td>
+                </tr>
+                <tr>
+                  <td>Schriftart</td>
+                  <td>Lora</td>
+                  <td><a href="https://fonts.google.com/specimen/Lora" target="_blank" rel="noopener noreferrer">Google Fonts – Lora</a></td>
+                  <td>Cyreal</td>
+                  <td>SIL Open Font License 1.1 (OFL)</td>
+                </tr>
+
+                <!-- Grafiken / Icons -->
+                <tr>
+                  <td colspan="5" style="background:var(--ivory-dark);font-family:var(--font-ui);font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:8px 13px;">Grafiken &amp; Icons</td>
+                </tr>
+                <tr>
+                  <td>Icon (SVG)</td>
+                  <td>Translate-Icon (Sprachsymbol im App-Mock)</td>
+                  <td><a href="https://fonts.google.com/icons" target="_blank" rel="noopener noreferrer">Google Material Symbols</a></td>
+                  <td>Google LLC</td>
+                  <td>Lizenz: CC0 – Bedingungslose Nutzung</td>
+                </tr>
+                <tr>
+                  <td>Grafik (SVG)</td>
+                  <td>Wellenform-Bildmarke (drei Bögen)</td>
+                  <td>Eigene Erstellung – LinguaFlow GmbH</td>
+                  <td>LinguaFlow GmbH</td>
+                  <td>© 2026 LinguaFlow GmbH – eingetragene Marke, alle Rechte vorbehalten</td>
+                </tr>
+                <tr>
+                  <td>Grafik (SVG)</td>
+                  <td>Hintergrundmuster</td>
+                  <td>Eigene Erstellung – LinguaFlow GmbH</td>
+                  <td>LinguaFlow GmbH</td>
+                  <td>© 2026 LinguaFlow GmbH</td>
+                </tr>
+
+                <!-- Emojis -->
+                <tr>
+                  <td colspan="5" style="background:var(--ivory-dark);font-family:var(--font-ui);font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:8px 13px;">Emojis</td>
+                </tr>
+                <tr>
+                  <td>Emoji</td>
+                  <td>Flaggen-Emojis</td>
+                  <td><a href="https://unicode.org/emoji/charts/emoji-list.html" target="_blank" rel="noopener noreferrer">Unicode Consortium</a> / Betriebssystem-Renderer</td>
+                  <td>Unicode Consortium</td>
+                  <td>Lizenz: CC0 – Bedingungslose Nutzung (Unicode-Zeichensatz)</td>
+                </tr>
+                <tr>
+                  <td>Emoji</td>
+                  <td>UI-Emojis</td>
+                  <td><a href="https://unicode.org/emoji/charts/emoji-list.html" target="_blank" rel="noopener noreferrer">Unicode Consortium</a> / Betriebssystem-Renderer</td>
+                  <td>Unicode Consortium</td>
+                  <td>Lizenz: CC0 – Bedingungslose Nutzung (Unicode-Zeichensatz)</td>
+                </tr>
+
+                <!-- Texte -->
+                <tr>
+                  <td colspan="5" style="background:var(--ivory-dark);font-family:var(--font-ui);font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:8px 13px;">Texte</td>
+                </tr>
+                <tr>
+                  <td>Text</td>
+                  <td>Website-Texte &amp; Produktbeschreibungen</td>
+                  <td>Eigene Erstellung – LinguaFlow GmbH</td>
+                  <td>LinguaFlow GmbH</td>
+                  <td>© 2026 LinguaFlow GmbH – alle Rechte vorbehalten</td>
+                </tr>
+                <tr>
+                  <td>Text</td>
+                  <td>Lizenz- und Rechtstexte</td>
+                  <td>Eigene Erstellung – LinguaFlow GmbH</td>
+                  <td>LinguaFlow GmbH</td>
+                  <td>© 2026 LinguaFlow GmbH – alle Rechte vorbehalten</td>
+                </tr>
+                <tr>
+                  <td>Text</td>
+                  <td>Fremdsprachige Beispielsätze (App-Mock: Japanisch, Französisch)</td>
+                  <td>Eigene Erstellung – LinguaFlow GmbH</td>
+                  <td>LinguaFlow GmbH</td>
+                  <td>© 2026 LinguaFlow GmbH</td>
+                </tr>
+
+                <!-- Farben / Design -->
+                <tr>
+                  <td colspan="5" style="background:var(--ivory-dark);font-family:var(--font-ui);font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:8px 13px;">Farben &amp; Design</td>
+                </tr>
+                <tr>
+                  <td>Farbpalette</td>
+                  <td>LinguaFlow-Farbmarke (Terrakotta #B85C38, Elfenbein #F5F0E8, Saphir #2D5078, Salbei #4A6741, Tinte #1C1915)</td>
+                  <td>Eigene Erstellung – LinguaFlow GmbH</td>
+                  <td>LinguaFlow GmbH</td>
+                  <td>© 2026 LinguaFlow GmbH – eingetragene Farbmarke (Nizza-Klassen 41, 42)</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /credits -->
+
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════
+       FOOTER
+  ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a class="logo" href="#" onclick="showPage('home')" aria-label="LinguaFlow – zur Startseite">
+            <span class="logo-word">Lingua<span>Flow</span></span>
+            <span class="logo-dot" aria-hidden="true"></span>
+          </a>
+          <p>KI-gestützte Sprachlernplattform aus Wien. Für alle, die Sprachen wirklich sprechen wollen.</p>
+        </div>
+        <div class="footer-col">
+          <h3>Produkt</h3>
+          <ul>
+            <li><a href="#" onclick="showPage('home')">Funktionen</a></li>
+            <li><a href="#" onclick="showPage('shop')">Preise</a></li>
+            <li><a href="#" onclick="showPage('shop')">Für Teams</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Unternehmen</h3>
+          <ul>
+            <li><a href="#" onclick="showPage('about')">Über uns</a></li>
+            <li><a href="#" onclick="showPage('contact')">Kontakt</a></li>
+            <li><a href="#" onclick="showPage('impressum')">Impressum</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h3>Rechtliches</h3>
+          <ul>
+            <li><a href="#" onclick="showPage('privacy')">Datenschutz</a></li>
+            <li><a href="#" onclick="showPage('license')">Lizenz</a></li>
+            <li><a href="#" onclick="showPage('accessibility')">Barrierefreiheit</a></li>
+            <li><a href="#" onclick="showPage('credits')">Bildnachweis</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 LinguaFlow GmbH, Wien — Alle Rechte vorbehalten</span>
+        <span>Schriften: DM Serif Display, Instrument Sans, Lora (SIL OFL 1.1 · Google Fonts)</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════════════════════════════
+       COOKIE BANNER
+  ══════════════════════════════════════════════════════════ -->
+  <div id="cookie-banner" class="cookie-banner" role="dialog" aria-modal="false" aria-label="Cookie-Einstellungen" aria-describedby="cookie-desc">
+    <p id="cookie-desc">
+      Wir verwenden essentielle Cookies sowie — mit Ihrer Einwilligung — Analyse-Cookies (Plausible Analytics, DSGVO-konform, EU-Server).
+      <a href="#" onclick="showPage('privacy')">Mehr erfahren</a>
+    </p>
+    <div class="cookie-actions">
+      <button class="btn btn-ghost" onclick="acceptCookies()" style="font-size:0.8rem;padding:8px 15px;color:var(--ivory);border-color:#3A3630;">Nur essentielle</button>
+      <button class="btn btn-primary" onclick="acceptCookies()" style="font-size:0.8rem;padding:8px 15px;">Alle akzeptieren</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════════
+       CHECKOUT MODAL
+  ══════════════════════════════════════════════════════════ -->
+  <div id="checkout-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="co-heading">
+    <div class="modal">
+      <button class="modal-close" onclick="closeCheckout()" aria-label="Bestellung schließen">&times;</button>
+      <h2 id="co-heading">Abonnement: <span id="co-plan"></span></h2>
+      <p class="modal-sub">Preis: <strong id="co-price"></strong> / Monat</p>
+      <div class="mock-note" role="note">🧪 Demo-Checkout — keine echte Zahlung. Daten werden nicht übertragen.</div>
+      <div class="form-group">
+        <label for="co-email">E-Mail-Adresse</label>
+        <input type="email" id="co-email" placeholder="ihre@email.at" autocomplete="email" />
+      </div>
+      <div class="form-group">
+        <label for="co-card">Kartennummer</label>
+        <input type="text" id="co-card" placeholder="4242 4242 4242 4242" maxlength="19" autocomplete="cc-number" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="co-exp">Ablaufdatum</label>
+          <input type="text" id="co-exp" placeholder="MM/JJ" maxlength="5" autocomplete="cc-exp" />
+        </div>
+        <div class="form-group">
+          <label for="co-cvc">CVC</label>
+          <input type="text" id="co-cvc" placeholder="123" maxlength="3" autocomplete="cc-csc" />
+        </div>
+      </div>
+      <p style="font-family:var(--font-ui);font-size:0.78rem;color:var(--muted);margin-bottom:16px;">
+        Mit dem Kauf akzeptieren Sie unsere <a href="#" onclick="closeCheckout();showPage('license')">Lizenzbestimmungen</a>. Kündigung jederzeit möglich.
+      </p>
+      <button class="btn btn-primary" onclick="confirmCheckout()" style="width:100%;justify-content:center;">Jetzt abonnieren</button>
+    </div>
+  </div>
+
+  <script>
+    function showPage(id) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      const t = document.getElementById('page-' + id);
+      if (t) { t.classList.add('active'); }
+      document.querySelectorAll('.nav-links a[data-page]').forEach(a => {
+        a.removeAttribute('aria-current');
+        if (a.dataset.page === id) a.setAttribute('aria-current', 'page');
+      });
+      const m = document.getElementById('main-content');
+      m.focus();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const nl = document.getElementById('main-nav');
+      nl.classList.remove('open');
+      document.querySelector('.nav-toggle').setAttribute('aria-expanded', 'false');
+      return false;
+    }
+
+    document.querySelector('.nav-toggle').addEventListener('click', function () {
+      const nl = document.getElementById('main-nav');
+      const open = nl.classList.toggle('open');
+      this.setAttribute('aria-expanded', String(open));
+      this.setAttribute('aria-label', open ? 'Navigation schließen' : 'Navigation öffnen');
+    });
+
+    function toggleBilling(cb) {
+      const y = cb.checked;
+      document.getElementById('pro-price').textContent = y ? '€79,99' : '€9,99';
+      document.getElementById('pro-period').textContent = y ? '/ Jahr' : '/ Monat';
+      document.getElementById('biz-price').textContent = y ? '€299,99' : '€29,99';
+      document.getElementById('biz-period').textContent = y ? '/ Jahr' : '/ Monat';
+    }
+
+    function openCheckout(plan, price) {
+      if (plan === 'Gratis') { alert('Gratis-Konto: Einfach registrieren — keine Kreditkarte nötig! (Demo)'); return; }
+      document.getElementById('co-plan').textContent = plan;
+      document.getElementById('co-price').textContent = '€' + price;
+      const o = document.getElementById('checkout-overlay');
+      o.classList.add('open');
+      o.querySelector('input').focus();
+    }
+
+    function closeCheckout() { document.getElementById('checkout-overlay').classList.remove('open'); }
+
+    function confirmCheckout() {
+      closeCheckout();
+      setTimeout(() => alert('✓ Danke! Ihr Abonnement wurde aktiviert. (Demo — keine echte Zahlung)'), 100);
+    }
+
+    document.getElementById('checkout-overlay').addEventListener('click', function (e) { if (e.target === this) closeCheckout(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckout(); });
+
+    document.getElementById('checkout-overlay').addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab') return;
+      const f = [...this.querySelectorAll('button, input, a[href]')];
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    function acceptCookies() { document.getElementById('cookie-banner').classList.add('hidden'); }
+
+    function submitForm() {
+      const name = document.getElementById('c-name').value.trim();
+      const email = document.getElementById('c-email').value.trim();
+      const msg = document.getElementById('c-msg').value.trim();
+      const priv = document.getElementById('c-privacy').checked;
+      if (!name || !email || !msg) { alert('Bitte füllen Sie alle Pflichtfelder aus.'); return; }
+      if (!priv) { alert('Bitte stimmen Sie der Datenschutzerklärung zu.'); return; }
+      document.getElementById('contact-form').style.display = 'none';
+      const s = document.getElementById('form-success');
+      s.style.display = 'block';
+      s.focus();
+    }
+  </script>
+
+</body>
+</html>
